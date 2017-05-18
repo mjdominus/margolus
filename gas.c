@@ -91,7 +91,7 @@ void display() {
   glClear(GL_COLOR_BUFFER_BIT);   // Clear the color buffer with current clearing color
 
   draw(m);
-  glFlush();  // Render now
+  glutSwapBuffers();  // Render now
   iterate_neighborhoods(m, rot_random);
   toggle_mode(m);
 }
@@ -104,7 +104,8 @@ void Timer(int v) {
 /* Main function: GLUT runs as a console application starting at main()  */
 int main(int argc, char** argv) {
    glutInit(&argc, argv);          // Initialize GLUT
-   glutCreateWindow("Circle");  // Create window with the given title
+   glutInitDisplayMode(GLUT_DOUBLE);
+   glutCreateWindow("Gas Diffusion");  // Create window with the given title
    glutInitWindowSize(N, N); // Set the window's initial width & height
    glutInitWindowPosition(1500, 50); // Position the window's initial top-left corner
    glutDisplayFunc(display);       // Register callback handler for window re-paint event
