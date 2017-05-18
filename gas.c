@@ -4,22 +4,11 @@
  */
 #include <GL/glut.h>  // GLUT, include glu.h and gl.h
 #include <stdio.h>
+#include <stdlib.h>
 #include <assert.h>
+#include "margolus.h"
 
-#define N 200                   /* pixel array size */
-#define MIN (-N/2)
-#define MAX (N/2)
-unsigned char g[N][N];          /* box of gas */
-
-#define chk(r, c) (((r) < MIN || (r) >= MAX) ?   \
-(fprintf(stderr, "r=%d out of range\n", (r)), abort())      \
-: ((c) < MIN || (c) >= MAX) ?                                           \
- (fprintf(stderr, "c=%d out of range\n", (c)), abort())                 \
-   : 1)
-  
-#define set(r, c) do { chk(r,c); g[(r)-MIN][(c)-MIN] = 1; } while (0)
-#define clr(r, c) do { chk(r,c); g[(r)-MIN][(c)-MIN] = 0; } while (0)
-#define pxl(r, c) ((chk(r,c)), g[(r)-MIN][(c)-MIN])
+MARG m;
 
 /* Initialize OpenGL Graphics */
 void initGL() {
@@ -27,51 +16,71 @@ void initGL() {
    glClearColor(0.0f, 0.0f, 0.0f, 1.0f); // Black and opaque
 }
 
-#define sq(x) ((x) * (x))
+#define N 10
+#define sq(x) ((x)*(x))
+
+void initGasPoint() {
+  set(m, m->rows / 2, m->cols / 2, 1);
+}
 
 /* circular gas thing */
-void initGas() {
-  int rad2 = (N/4)*(N/4);
-  int XC = 0, YC = 0;
-  unsigned count = 0, on = 0, on2 = 0 ;
+void initGasCircle() {
+  int rad2 = (N/3)*(N/3);
+  int XC = N/2, YC = N/2;
+  unsigned count = 0, on = 0 ;
   int r, c;
-  for (r=MIN; r < MAX; r++) {
-    for (c=MIN; c < MAX; c++) {
-      if (sq(r-YC) + sq(c-XC) <= rad2) { on++; set(r, c); }
+
+  for (r=0; r < N; r++) {
+    for (c=0; c < N; c++) {
+      if (sq(r-YC) + sq(c-XC) <= rad2) { on++; set(m, r, c, 1); }
       count++;
     }
   }
-  fprintf(stderr, "Counted %u pixels on out of %u\n", on, count);
 }
  
+void initGasRandom() {
+  int r, c;
+
+  for (r=0; r < N; r++) {
+    for (c=0; c < N; c++) {
+      if (random() % 2) { set(m, r, c, 1); }
+    }
+  }
+}
+ 
+void initGas() {
+  m = new(N, N);
+
+  initGasPoint();
+}
+
+
 /* Handler for window-repaint event. Call back when the window first appears and
    whenever the window needs to be re-painted. */
 void display() {
-  int r, c;
+  void drawGas(void);
   
   glClear(GL_COLOR_BUFFER_BIT);   // Clear the color buffer with current clearing color
- 
-  // Define shapes enclosed within a pair of glBegin and glEnd
-  glBegin(GL_POINTS); 
 
-  for (r=MIN; r < MAX; r++) {
-    for (c=MIN; c < MAX; c++) {
-      glColor3f(0.0f, 0.0f, pxl(r, c) ? 1.0f : 0.0f);
-      glVertex2f(c/(float)MAX, r/(float)MAX);
-    }
-  }
-   glEnd();
- 
-   glFlush();  // Render now
+  draw(m);
+  glFlush();  // Render now
+  iterate_neighborhoods(m, rot_random);
+  toggle_mode(m);
 }
- 
+
+void Timer(int v) {
+  glutPostRedisplay();
+  glutTimerFunc(300, Timer, 0); // next Timer call milliseconds later 
+}
+
 /* Main function: GLUT runs as a console application starting at main()  */
 int main(int argc, char** argv) {
    glutInit(&argc, argv);          // Initialize GLUT
    glutCreateWindow("Circle");  // Create window with the given title
    glutInitWindowSize(N, N); // Set the window's initial width & height
-   glutInitWindowPosition(50, 50); // Position the window's initial top-left corner
+   glutInitWindowPosition(1500, 50); // Position the window's initial top-left corner
    glutDisplayFunc(display);       // Register callback handler for window re-paint event
+   glutTimerFunc(30, Timer, 0);
    initGL();                       // Our own OpenGL initialization
    initGas();
    glutMainLoop();                 // Enter the event-processing loop
