@@ -17,7 +17,7 @@ void initGL() {
 }
 
 #define timeout 20  // milliseconds
-#define N 10
+#define N 200
 #define sq(x) ((x)*(x))
 
 void initGasPoint() {
