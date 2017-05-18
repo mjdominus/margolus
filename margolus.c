@@ -15,6 +15,7 @@
 #define memfail() do { fprintf(stderr, "Couldn't allocate memory\n"); exit(11); } while (0)
 
 MARG new(unsigned rows, unsigned cols) {
+  void init_cmap(struct st_color *);
   MARG marg = (MARG) malloc(sizeof(struct st_marg));
   if (! marg) memfail();
 
@@ -26,6 +27,8 @@ MARG new(unsigned rows, unsigned cols) {
     marg->mode = 0;
   }
 
+  init_cmap(marg->cmap);
+
   {
     size_t memsize = marg->R * marg->C * sizeof(pixel);
     pixel *g = malloc(memsize);
@@ -35,6 +38,22 @@ MARG new(unsigned rows, unsigned cols) {
   }
 
   return marg;
+}
+
+#define BLACK   ((struct st_color) { 0.0f, 0.0f, 0.0f })
+#define RED     ((struct st_color) { 1.0f, 0.0f, 0.0f })
+#define YELLOW  ((struct st_color) { 1.0f, 1.0f, 0.0f })
+#define GREEN   ((struct st_color) { 0.0f, 1.0f, 0.0f })
+#define CYAN    ((struct st_color) { 0.0f, 1.0f, 1.0f })
+#define BLUE    ((struct st_color) { 0.0f, 0.0f, 1.0f })
+#define MAGENTA ((struct st_color) { 1.0f, 0.0f, 1.0f })
+#define WHITE   ((struct st_color) { 1.0f, 1.0f, 1.0f })
+#define GRAY50  ((struct st_color) { 0.5f, 0.5f, 0.5f })
+
+void init_cmap(struct st_color cmap[]) {
+  cmap[0] = BLACK;
+  cmap[1] = BLUE;
+  cmap[2] = RED;
 }
 
 /* Say the marg has 100 cols.  They are numbered from 0 to 99
@@ -189,10 +208,10 @@ void draw (MARG m) {
     y = 2.0*r / m->rows - 1.0;
     yy = 2.0*(r+1) / m->rows - 1.0;
     for (c=0; c < m->cols; c++) {
-      float color = get(m, r, c) ? 1.0f : 0.0f;
+      struct st_color color = m->cmap[get(m, r, c)];
       x = 2.0*c / m->cols - 1.0;
-      glColor3f(color, color, color);
       xx = 2.0*(c+1) / m->cols - 1.0;
+      glColor3f(color.r, color.g, color.b);
       glVertex2f(x,   y);
       glVertex2f(x+1, y);
       glVertex2f(x+1, y+1);

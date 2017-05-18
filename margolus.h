@@ -3,11 +3,15 @@
 typedef char pixel;
 
 #define BLANK_PIXEL 0
+struct st_color {
+  float r,g,b;
+};
 
 typedef struct st_marg {
   unsigned cols, rows;          /* size of field */
   unsigned C, R;                /* size of PIXEL ARRAY (C=cols+2, R=rows+2) */
   unsigned mode;                /* 0-based neighborhoods or 1-based? */
+  struct st_color cmap[255];    /* color map */
   pixel *g;                     /* stub for pixel array */
 } *MARG;
 
