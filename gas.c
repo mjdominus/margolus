@@ -16,6 +16,7 @@ void initGL() {
    glClearColor(0.0f, 0.0f, 0.0f, 1.0f); // Black and opaque
 }
 
+#define timeout 20  // milliseconds
 #define N 10
 #define sq(x) ((x)*(x))
 
@@ -70,7 +71,7 @@ void display() {
 
 void Timer(int v) {
   glutPostRedisplay();
-  glutTimerFunc(300, Timer, 0); // next Timer call milliseconds later 
+  glutTimerFunc(timeout, Timer, 0); // next Timer call milliseconds later 
 }
 
 /* Main function: GLUT runs as a console application starting at main()  */
@@ -80,7 +81,7 @@ int main(int argc, char** argv) {
    glutInitWindowSize(N, N); // Set the window's initial width & height
    glutInitWindowPosition(1500, 50); // Position the window's initial top-left corner
    glutDisplayFunc(display);       // Register callback handler for window re-paint event
-   glutTimerFunc(30, Timer, 0);
+   glutTimerFunc(timeout, Timer, 0);
    initGL();                       // Our own OpenGL initialization
    initGas();
    glutMainLoop();                 // Enter the event-processing loop
