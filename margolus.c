@@ -182,16 +182,21 @@ void scramble (NBHD nb) {
  * Instead of points, use quads of the right size */
 void draw (MARG m) {
   unsigned r, c;
-  float x, y;
+  float x, xx, y, yy;
 
-  glBegin(GL_POINTS);
+  glBegin(GL_QUADS);
   for (r=0; r < m->rows; r++) {
     y = 2.0*r / m->rows - 1.0;
+    yy = 2.0*(r+1) / m->rows - 1.0;
     for (c=0; c < m->cols; c++) {
       float color = get(m, r, c) ? 1.0f : 0.0f;
       x = 2.0*c / m->cols - 1.0;
       glColor3f(color, color, color);
-      glVertex2f(x, y);
+      xx = 2.0*(c+1) / m->cols - 1.0;
+      glVertex2f(x,   y);
+      glVertex2f(x+1, y);
+      glVertex2f(x+1, y+1);
+      glVertex2f(x,   y+1);
     }
   }
   glEnd();
