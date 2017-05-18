@@ -48,11 +48,38 @@ void initGasRandom() {
     }
   }
 }
- 
+
+void initGasSquare(unsigned s) {
+  int r, c;
+  unsigned count = 0;
+
+  for (r=s; r < N-s; r++) {
+    for (c=s; c < N-s; c++) {
+      set(m, r, c, 1);
+    }
+  }
+}
+
+void initGasRect(unsigned top, unsigned left, unsigned ht, unsigned wd, unsigned col) {
+  int r, c;
+
+  for (r=top; r < top+ht; r++) {
+    for (c=left; c < left+wd; c++) {
+      set(m, r, c, col);
+    }
+  }
+}
+
+void  initGas2Rectangles() {
+  initGasRect(N/6, N/6, 2*N/3, N/3, 1);
+  initGasRect(N/6, N/2, 2*N/3, N/3, 2);
+}
+
+
 void initGas() {
   m = new(N, N);
 
-  initGasPoint();
+  initGas2Rectangles();
 }
 
 
